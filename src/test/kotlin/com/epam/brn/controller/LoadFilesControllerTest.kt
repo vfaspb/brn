@@ -1,5 +1,7 @@
 package com.epam.brn.controller
 
+import com.epam.brn.service.StudyHistoryService
+import com.epam.brn.service.UserAccountService
 import com.epam.brn.upload.CsvUploadService
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
@@ -16,10 +18,16 @@ import java.io.FileInputStream
 internal class LoadFilesControllerTest {
 
     @InjectMocks
-    lateinit var loadFilesController: LoadFilesController
+    lateinit var loadFilesController: AdminController
 
     @Mock
     lateinit var csvUploadService: CsvUploadService
+
+    @Mock
+    lateinit var studyHistoryService: StudyHistoryService
+
+    @Mock
+    lateinit var userAccountService: UserAccountService
 
     @Test
     fun `should call upload service to load file for 1 series`() {
