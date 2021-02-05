@@ -2,14 +2,24 @@ package com.epam.brn.service
 
 import com.epam.brn.dto.SubGroupDto
 import com.epam.brn.exception.EntityNotFoundException
-import com.epam.brn.repo.SubGroupRepository
 import com.epam.brn.model.SubGroup
+import com.epam.brn.model.SubGroupUserProgress
+import com.epam.brn.repo.ExerciseRepository
+import com.epam.brn.repo.StudyHistoryRepository
+import com.epam.brn.repo.SubGroupRepository
 import org.apache.logging.log4j.kotlin.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.util.*
+import kotlin.collections.HashMap
 
 @Service
-class SubGroupService(private val subGroupRepository: SubGroupRepository) {
+class SubGroupService(
+        private val subGroupRepository: SubGroupRepository,
+        private val userAccountService: UserAccountService,
+        private val studyHistoryRepository: StudyHistoryRepository,
+        private val exerciseRepository: ExerciseRepository
+) {
 
     @Value(value = "\${brn.picture.theme.path}")
     private lateinit var pictureTheme: String
@@ -28,6 +38,19 @@ class SubGroupService(private val subGroupRepository: SubGroupRepository) {
             .orElseThrow { EntityNotFoundException("No subGroup was found by id=$subGroupId.") }
         return subGroup.toDto(pictureTheme)
     }
+
+    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): Map<Long,SubGroupUserProgress> {
+        val currentUser = userAccountService.getUserFromTheCurrentSession()
+        val subGroupIdToSubGroupProgressPair: Map<Long, SubGroupUserProgress> = emptyMap()
+        subGroupIds.forEach {
+            subGroupIdToSubGroupProgressPair + Pair(it, SubGroupUserProgress(
+                    studyHistoryRepository.getDoneExercises(it, currentUser.id!!).size,
+                    exerciseRepository.findExercisesBySubGroupId(it).size
+            ))
+        }
+        return subGroupIdToSubGroupProgressPair
+    }
+
 }
 
 fun SubGroup.toDto(pictureUrlTemplate: String): SubGroupDto {
