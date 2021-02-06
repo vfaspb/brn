@@ -36,16 +36,13 @@ class SubGroupService(
         return subGroup.toDto(pictureTheme)
     }
 
-    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): Map<Long, Pair<Int, Int>> {
+    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): Map<Long, Map<Int, Int>> {
         log.debug("Trying to get done/all exercises for each subGroup. subGroupIds=$subGroupIds")
         val currentUser = userAccountService.getUserFromTheCurrentSession()
         return subGroupIds.map {
-            Pair(
-                it,
-                Pair(
-                    studyHistoryRepository.getDoneExercises(it, currentUser.id!!).size,
+            it to mapOf(
+                studyHistoryRepository.getDoneExercises(it, currentUser.id!!).size to
                     exerciseRepository.findExercisesBySubGroupId(it).size
-                )
             )
         }.toMap()
     }
