@@ -3,22 +3,19 @@ package com.epam.brn.service
 import com.epam.brn.dto.SubGroupDto
 import com.epam.brn.exception.EntityNotFoundException
 import com.epam.brn.model.SubGroup
-import com.epam.brn.model.SubGroupUserProgress
 import com.epam.brn.repo.ExerciseRepository
 import com.epam.brn.repo.StudyHistoryRepository
 import com.epam.brn.repo.SubGroupRepository
 import org.apache.logging.log4j.kotlin.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.util.*
-import kotlin.collections.HashMap
 
 @Service
 class SubGroupService(
-        private val subGroupRepository: SubGroupRepository,
-        private val userAccountService: UserAccountService,
-        private val studyHistoryRepository: StudyHistoryRepository,
-        private val exerciseRepository: ExerciseRepository
+    private val subGroupRepository: SubGroupRepository,
+    private val userAccountService: UserAccountService,
+    private val studyHistoryRepository: StudyHistoryRepository,
+    private val exerciseRepository: ExerciseRepository
 ) {
 
     @Value(value = "\${brn.picture.theme.path}")
@@ -39,18 +36,19 @@ class SubGroupService(
         return subGroup.toDto(pictureTheme)
     }
 
-    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): Map<Long,SubGroupUserProgress> {
+    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): Map<Long, Pair<Int, Int>> {
+        log.debug("Trying to get done/all exercises for each subGroup. subGroupIds=$subGroupIds")
         val currentUser = userAccountService.getUserFromTheCurrentSession()
-        val subGroupIdToSubGroupProgressPair: Map<Long, SubGroupUserProgress> = emptyMap()
-        subGroupIds.forEach {
-            subGroupIdToSubGroupProgressPair + Pair(it, SubGroupUserProgress(
+        return subGroupIds.map {
+            Pair(
+                it,
+                Pair(
                     studyHistoryRepository.getDoneExercises(it, currentUser.id!!).size,
                     exerciseRepository.findExercisesBySubGroupId(it).size
-            ))
-        }
-        return subGroupIdToSubGroupProgressPair
+                )
+            )
+        }.toMap()
     }
-
 }
 
 fun SubGroup.toDto(pictureUrlTemplate: String): SubGroupDto {
