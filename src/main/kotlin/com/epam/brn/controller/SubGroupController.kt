@@ -19,12 +19,7 @@ class SubGroupController(val subGroupsService: SubGroupService) {
 
     @GetMapping
     @ApiOperation("Get subGroups for series id.")
-    fun getAllGroups(
-        @RequestParam(
-            value = "seriesId",
-            required = true
-        ) seriesId: Long
-    ): ResponseEntity<BaseResponseDto> {
+    fun getAllGroups(@RequestParam(value = "seriesId", required = true) seriesId: Long): ResponseEntity<BaseResponseDto> {
         val data = subGroupsService.findSubGroupsForSeries(seriesId)
         return ResponseEntity.ok().body(BaseResponseDto(data = data))
     }
