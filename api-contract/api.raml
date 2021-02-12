@@ -89,6 +89,29 @@ mediaType:
         200:
           body:
             example: !include samples/subgroup_by_id.json
+  /statistic:
+    get:
+      queryParameters:
+        ids:
+          description: "List of IDs of subGroups"
+          required: true
+          type: List<Long>
+          example: "1,2,3"
+      responses:
+        200:
+          body:
+            example: {
+              data: {
+                "1": {
+                  "0": 28
+                },
+                "2": {
+                  "0": 56
+                }
+              },
+              errors: [],
+              meta: []
+            }
 
 
 # EXERCISE ----------------------------
