@@ -169,6 +169,7 @@ class SubGroupControllerIT : BaseIT() {
             insertSubGroup(series, 1),
             insertSubGroup(series, 10)
         )
+        val subGroupIds = subGroups.map { it.id }
         val exercises = listOf(
             insertExercise(subGroup = subGroups[0]),
             insertExercise(subGroup = subGroups[1])
@@ -177,9 +178,9 @@ class SubGroupControllerIT : BaseIT() {
 
         val resultAction = mockMvc.perform(
             get("$baseUrl/statistic")
-                .param("ids", "1,2")
+                .param("ids", "${subGroupIds.get(0)},${subGroupIds.get(1)}")
         )
-
+        println(currentUser)
         val response = resultAction
             .andExpect(status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
