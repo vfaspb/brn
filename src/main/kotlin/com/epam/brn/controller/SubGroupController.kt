@@ -33,13 +33,13 @@ class SubGroupController(val subGroupsService: SubGroupService) {
 
     @GetMapping("/statistic")
     @ApiOperation("Get done/all tasks for each subGroup which id was passed in the ids list for current user.")
-    fun getUserGroupProgress(
+    fun getUserSubGroupProgress(
         @RequestParam(
             value = "ids",
             required = true
         ) ids: List<Long>
-    ): ResponseEntity<BaseSingleObjectResponseDto> {
+    ): ResponseEntity<BaseResponseDto> {
         val userSubGroupProgress = subGroupsService.getSubGroupsProgressForUser(ids)
-        return ResponseEntity.ok().body(BaseSingleObjectResponseDto(data = userSubGroupProgress))
+        return ResponseEntity.ok().body(BaseResponseDto(data = userSubGroupProgress))
     }
 }
