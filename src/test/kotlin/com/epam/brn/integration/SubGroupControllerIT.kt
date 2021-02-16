@@ -1,6 +1,7 @@
 package com.epam.brn.integration
 
-import com.epam.brn.dto.BaseSingleObjectResponseDto
+import com.epam.brn.dto.BaseResponseDto
+import com.epam.brn.dto.response.SubGroupStatisticDto
 import com.epam.brn.model.Exercise
 import com.epam.brn.model.ExerciseGroup
 import com.epam.brn.model.Gender
@@ -186,13 +187,15 @@ class SubGroupControllerIT : BaseIT() {
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andReturn().response.getContentAsString(StandardCharsets.UTF_8)
 
-        val baseResponseDto = objectMapper.readValue(response, BaseSingleObjectResponseDto::class.java)
+        val baseResponseDto = objectMapper.readValue(response, BaseResponseDto::class.java)
         val baseResponseJson = Gson().toJson(baseResponseDto.data)
-        val resultStatistic: Map<Long, Map<Int, Int>> =
-            objectMapper.readValue(baseResponseJson, object : TypeReference<Map<Long, Map<Int, Int>>>() {})
-        val values = resultStatistic.values
+        val resultStatistic: List<SubGroupStatisticDto> =
+            objectMapper.readValue(baseResponseJson, object : TypeReference<List<SubGroupStatisticDto>>() {})
 
-        Assertions.assertTrue(values.contains(mapOf(1 to 1)))
-        Assertions.assertTrue(values.contains(mapOf(0 to 1)))
+        Assertions.assertEquals(1, resultStatistic.first().totalExercises)
+        Assertions.assertEquals(1, resultStatistic.first().completedExercises)
+
+        Assertions.assertEquals(0, resultStatistic[1].completedExercises)
+        Assertions.assertEquals(1, resultStatistic[1].totalExercises)
     }
 }

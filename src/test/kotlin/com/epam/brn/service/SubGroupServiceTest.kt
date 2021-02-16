@@ -19,7 +19,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 /**
  * @author Nikolai Lazarev
@@ -70,8 +69,9 @@ internal class SubGroupServiceTest {
         verify(exerciseRepository, times(1)).findExercisesBySubGroupId(anyLong())
 
         assertNotNull(result)
-        Assertions.assertTrue(result.get(subGroupIds.first())!!.keys.contains(0))
-        Assertions.assertTrue(result.get(subGroupIds.first())!!.values.contains(2))
+        Assertions.assertTrue(result.first().subGroupId.equals(subGroupIds.first()))
+        Assertions.assertTrue(result.first().completedExercises.equals(0))
+        Assertions.assertTrue(result.first().totalExercises.equals(2))
     }
 
     @Test

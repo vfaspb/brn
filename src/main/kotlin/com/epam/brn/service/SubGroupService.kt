@@ -1,6 +1,7 @@
 package com.epam.brn.service
 
 import com.epam.brn.dto.SubGroupDto
+import com.epam.brn.dto.response.SubGroupStatisticDto
 import com.epam.brn.exception.EntityNotFoundException
 import com.epam.brn.model.SubGroup
 import com.epam.brn.repo.ExerciseRepository
@@ -36,15 +37,16 @@ class SubGroupService(
         return subGroup.toDto(pictureTheme)
     }
 
-    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): Map<Long, Map<Int, Int>> {
+    fun getSubGroupsProgressForUser(subGroupIds: List<Long>): List<SubGroupStatisticDto> {
         log.debug("Trying to get done/all exercises for each subGroup. subGroupIds=$subGroupIds")
         val currentUser = userAccountService.getUserFromTheCurrentSession()
         return subGroupIds.map {
-            it to mapOf(
-                studyHistoryRepository.getDoneExercises(it, currentUser.id!!).size to
-                    exerciseRepository.findExercisesBySubGroupId(it).size
+            SubGroupStatisticDto(
+                subGroupId = it,
+                completedExercises = studyHistoryRepository.getDoneExercises(it, currentUser.id!!).size,
+                totalExercises = exerciseRepository.findExercisesBySubGroupId(it).size
             )
-        }.toMap()
+        }.toList()
     }
 }
 
